@@ -1,30 +1,30 @@
-# blob-stream
+# file-system-stream
 
-A Node-style writable stream for [HTML5 Blobs](https://developer.mozilla.org/en-US/docs/Web/API/Blob), 
+A Node-style writable stream for [HTML5 File System API](http://dev.w3.org/2009/dap/file-system/pub/FileSystem/), 
 mostly useful in [Browserify](http://browserify.org/).  Allows you to take the output of any Node stream,
-and turn it into a Blob or Blob URL for opening in the browser, uploading to a server, etc.
-
-If you don't want to use Browserify, you can also 
-[download a prebuilt version](https://github.com/devongovett/blob-stream/releases) of the library.
-
-[![browser support](https://ci.testling.com/devongovett/blob-stream.png)
-](https://ci.testling.com/devongovett/blob-stream)
+and turn it into FileSystem for opening in the browser, uploading to a server, etc.
 
 ## Example
 
 ```javascript
-var blobStream = require('blob-stream');
+var fileSystemStream = require('file-system-stream');
 
-someStream
-  .pipe(blobStream())
-  .on('finish', function() {
-    // get a blob
-    var blob = this.toBlob();
-    
-    // or get a blob URL
-    var url = this.toBlobURL();
-    window.open(url);
-  });
+var onInitFs = function(){
+  fs.root.getFile('log.txt', {create: true, exclusive: true}, function(fileEntry){
+      fileEntry.createWriter(function(fileWriter) {
+          someStream
+            .pipe(fileSystemStream(fileEntry, writer))
+            .on('finish', function() {
+              // get a blob
+              window.open(fileEntry.toURL());
+            });
+          
+        }, function(err){console.log(err);})
+    }, function(err){console.log(err);});
+}
+
+
+window.requestFileSystem(window.TEMPORARY, 5*1024*1024 /*5MB*/, onInitFs, errorHandler);
 ```
 
 ## License
