@@ -1,5 +1,7 @@
 'use strict';
 
+
+//https://github.com/JSBizon/node-memorystream
 var STREAM = require('stream'),
     UTIL = require('util'),
     StringDecoder = require('string_decoder').StringDecoder;
@@ -213,11 +215,11 @@ MemoryReadableStream.prototype.toBlob = function(type) {
   
   // cache the blob if needed
   if (!this._blob) {
-    this._blob = new Blob(this._chunks, {
+    this._blob = new Blob(this.queue, {
       type: type
     });
     
-    this._chunks = []; // free memory
+    this.queue = []; // free memory
   }
   
   // if the cached blob's type doesn't match the requested type, make a new blob
